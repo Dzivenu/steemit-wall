@@ -66,9 +66,10 @@
 }
 
 .column h3 {
-  line-height: 40px;
-  height: 40px;
-  background: #eee;
+  line-height: 50px;
+  height: 50px;
+  background: #164584;
+  color: #fff;
 }
 
 .column h3:first-letter {
@@ -76,12 +77,18 @@
 }
 
 .column h3 .delete-column {
-  height: 40px;
-  line-height: 40px;
-  width: 40px;
+  height: 50px;
+  line-height: 50px;
+  width: 50px;
   border-radius: 0
 }
 
+
+.post {
+  background: #1a5099;
+  max-width: 960px;
+  margin: 0 auto;
+}
 
 .post .image {
   width: 100%;
@@ -96,19 +103,23 @@
   margin: 0;
   line-height: 17px;
   padding: 15px 10px 10px;
+  color: #fff;
+}
+
+.post h4 a {
+  color: #fff;
 }
 
 .post .reputation {
   font-size: 11px;
     padding: 1px 5px;
-    border: solid 1px #bbb;
+    border: solid 1px #fff;
     border-radius: 11px;
-    color: #999;
 }
 
 .post .footer {
-  border-bottom: solid 1px #ccc;
+  border-bottom: solid 5px #fff;
   padding: 10px 0;
   font-size: 16px;
-  color: #666;
+  color: #fff;
 }
