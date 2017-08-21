@@ -2,4 +2,4 @@
 
 ## A cusomtizable steemit.com multi feed.
 
-(prototype/proof-of-concept)
+### [Website](https://mktcode.github.io/steemit-wall/)<br><sup>(prototype/proof-of-concept)</sup>
