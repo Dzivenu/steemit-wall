@@ -6,12 +6,13 @@ var app = new Vue({
     username: '',
     account: null,
     showUser: false,
+    userUpdateRun: null,
     columns: [],
     addNewTag: null,
     addHotTag: null,
     addTrendingTag: null,
     addBlogUser: null,
-    addFeedUser: null,
+    addFeedUser: null
   },
   created: function() {
     events.$on('delete-column', (index) => {
@@ -22,9 +23,25 @@ var app = new Vue({
     lookupUsername: function () {
       steem.api.getAccounts([this.username], (err, accounts) => {
         this.account = null;
+        clearInterval(this.userUpdateRun);
         if (accounts.length) {
-          this.account = accounts[0];
-          this.account.profile = JSON.parse(this.account.json_metadata).profile;
+          steem.api.getFollowCount(this.username, (err, followers) => {
+            this.account = accounts[0];
+            this.account.profile = JSON.parse(this.account.json_metadata).profile;
+            this.account.followers = followers;
+            this.userUpdateRun = setInterval(this.userUpdate, 15000);
+          });
+        }
+      });
+    },
+    userUpdate: function () {
+      steem.api.getAccounts([this.username], (err, accounts) => {
+        if (accounts.length) {
+          steem.api.getFollowCount(this.username, (err, followers) => {
+            this.account = accounts[0];
+            this.account.profile = JSON.parse(this.account.json_metadata).profile;
+            this.account.followers = followers;
+          });
         }
       });
     },
@@ -56,6 +73,16 @@ var app = new Vue({
           break;
       }
       this.columnClass = this.columns.length;
+    },
+    calculateVotingPower: function() {
+      var secondsPassedSinceLastVote = (new Date - new Date(this.account.last_vote_time + "Z")) / 1000,
+          votingPower = this.account.voting_power;
+      votingPower += (10000 * secondsPassedSinceLastVote / 432000);
+
+      return Math.min(votingPower / 100, 100).toFixed(2);
+    },
+    calculateReputation: function(reputation, precision) {
+      return calculateSteemitUserReputation(reputation, precision);
     }
   },
   components: {
@@ -83,7 +110,7 @@ var app = new Vue({
               steem.api.getDiscussionsByCreated({tag: this.id, limit: this.limit}, (err, posts) => {
                 this.posts = posts;
               });
-            }, 10000);
+            }, 15000);
             break;
           case 'hot':
             steem.api.getDiscussionsByHot({tag: this.id, limit: this.limit}, (err, posts) => {
@@ -93,7 +120,7 @@ var app = new Vue({
               steem.api.getDiscussionsByHot({tag: this.id, limit: this.limit}, (err, posts) => {
                 this.posts = posts;
               });
-            }, 10000);
+            }, 15000);
             break;
           case 'trending':
             steem.api.getDiscussionsByTrending({tag: this.id, limit: this.limit}, (err, posts) => {
@@ -103,7 +130,7 @@ var app = new Vue({
               steem.api.getDiscussionsByTrending({tag: this.id, limit: this.limit}, (err, posts) => {
                 this.posts = posts;
               });
-            }, 10000);
+            }, 15000);
             break;
           case 'blog':
             steem.api.getDiscussionsByBlog({tag: this.id, limit: this.limit}, (err, posts) => {
@@ -113,7 +140,7 @@ var app = new Vue({
               steem.api.getDiscussionsByBlog({tag: this.id, limit: this.limit}, (err, posts) => {
                 this.posts = posts;
               });
-            }, 10000);
+            }, 15000);
             break;
           case 'feed':
             steem.api.getDiscussionsByFeed({tag: this.id, limit: this.limit}, (err, posts) => {
@@ -123,7 +150,7 @@ var app = new Vue({
               steem.api.getDiscussionsByFeed({tag: this.id, limit: this.limit}, (err, posts) => {
                 this.posts = posts;
               });
-            }, 10000);
+            }, 15000);
             break;
         }
       },
@@ -145,6 +172,9 @@ var app = new Vue({
               var curatorPayout = this.post.curator_payout_value.replace(' SBD', '');
 
               return (parseFloat(authorPayout) + parseFloat(curatorPayout)).toFixed(2);
+            },
+            calculateReputation: function(reputation, precision) {
+              return calculateSteemitUserReputation(reputation, precision);
             }
           }
         }
@@ -152,3 +182,7 @@ var app = new Vue({
     },
   }
 });
+
+function calculateSteemitUserReputation(reputation, precision) {
+  return (reputation < 0 ? '-' : '') + ((((Math.log10(Math.abs(reputation))) - 9) * 9) + 25).toFixed(precision);
+}
