@@ -92,6 +92,9 @@ var app = new Vue({
       methods: {
         deleteColumn: function() {
           events.$emit('delete-column', this.index);
+        },
+        typeLabel: function() {
+          return this.type.substr(0, 1).toUpperCase() + this.type.substr(1);
         }
       },
       data: function () {
