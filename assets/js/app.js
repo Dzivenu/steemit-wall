@@ -100,7 +100,7 @@ var app = new Vue({
       data: function () {
         return {
           posts: [],
-          limit: 20
+          limit: 10
         };
       },
       created: function () {
