@@ -42,7 +42,6 @@ var app = new Vue({
               this.account.profile = JSON.parse(this.account.json_metadata).profile;
               this.account.followers = followers;
               this.userUpdateRun = setInterval(this.userUpdate, 15000);
-              saveToLocalStorage('username', this.username);
             });
           }
         });
@@ -63,6 +62,7 @@ var app = new Vue({
       e.preventDefault();
       if (this.account) {
         this.showUser = true;
+        saveToLocalStorage('username', this.username);
       }
       return false;
     },
