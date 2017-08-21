@@ -15,24 +15,38 @@ var app = new Vue({
     addFeedUser: null
   },
   created: function() {
+    this.username = loadFromLocalStorage('username');
+    if (this.username) {
+      this.lookupUsername();
+      this.showUser = true;
+    }
+
+    if (loadFromLocalStorage('columns')) {
+      this.columns = loadFromLocalStorage('columns');
+    }
+
     events.$on('delete-column', (index) => {
       this.columns.splice(index, 1);
+      saveToLocalStorage('columns', this.columns);
     });
   },
   methods: {
     lookupUsername: function () {
-      steem.api.getAccounts([this.username], (err, accounts) => {
-        this.account = null;
-        clearInterval(this.userUpdateRun);
-        if (accounts.length) {
-          steem.api.getFollowCount(this.username, (err, followers) => {
-            this.account = accounts[0];
-            this.account.profile = JSON.parse(this.account.json_metadata).profile;
-            this.account.followers = followers;
-            this.userUpdateRun = setInterval(this.userUpdate, 15000);
-          });
-        }
-      });
+      if (this.username) {
+        steem.api.getAccounts([this.username], (err, accounts) => {
+          this.account = null;
+          clearInterval(this.userUpdateRun);
+          if (accounts.length) {
+            steem.api.getFollowCount(this.username, (err, followers) => {
+              this.account = accounts[0];
+              this.account.profile = JSON.parse(this.account.json_metadata).profile;
+              this.account.followers = followers;
+              this.userUpdateRun = setInterval(this.userUpdate, 15000);
+              saveToLocalStorage('username', this.username);
+            });
+          }
+        });
+      }
     },
     userUpdate: function () {
       steem.api.getAccounts([this.username], (err, accounts) => {
@@ -72,7 +86,7 @@ var app = new Vue({
           this.columns.push({type: 'feed', id: this.addFeedUser});
           break;
       }
-      this.columnClass = this.columns.length;
+      saveToLocalStorage('columns', this.columns);
     },
     calculateVotingPower: function() {
       var secondsPassedSinceLastVote = (new Date - new Date(this.account.last_vote_time + "Z")) / 1000,
@@ -188,4 +202,16 @@ var app = new Vue({
 
 function calculateSteemitUserReputation(reputation, precision) {
   return (reputation < 0 ? '-' : '') + ((((Math.log10(Math.abs(reputation))) - 9) * 9) + 25).toFixed(precision);
+}
+
+function saveToLocalStorage(key, value) {
+  if (typeof(Storage) !== "undefined") {
+    localStorage.setItem(key, JSON.stringify(value));
+  }
+}
+
+function loadFromLocalStorage(key) {
+  if (typeof(Storage) !== "undefined") {
+    return JSON.parse(localStorage.getItem(key));
+  }
 }
