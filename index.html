@@ -194,12 +194,16 @@
   <script type="text/x-template" id="app-post-template">
     <div class="post">
       <h4 class="uk-text-truncate">
-        <a v-bind:href="'https://steemit.com' +  post.url" target="_blank">{{ post.title }}</a><br>
+        <i v-if="post.first_reblogged_by || post.first_reblogged_on" class="uk-icon-refresh"></i>
+        <a v-bind:href="'https://steemit.com' +  post.url" target="_blank">
+          {{ post.title }}
+        </a><br>
         <small>
           {{ getDate(post.created) }}
           by <a v-bind:href="'https://steemit.com/@' +  post.author" target="_blank">{{ post.author }}</a>
           <span class="reputation">{{ calculateReputation(post.author_reputation, 1) }}</span>
           in <a v-bind:href="'https://steemit.com/new/' +  post.category" target="_blank">{{ post.category }}</a>
+          <span v-if="post.first_reblogged_by">(resteemed by <a v-bind:href="'https://steemit.com/@' +  post.first_reblogged_by" target="_blank">{{ post.first_reblogged_by }}</a>)</span>
         </small>
       </h4>
       <a v-bind:href="'https://steemit.com' +  post.url" target="_blank" class="image" v-bind:style="{ backgroundImage: meta.image ? 'url(' + meta.image[0] + ')' : 'url(/assets/img/steemitwall-default-image.jpg)' }"></a>
