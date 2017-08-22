@@ -11,6 +11,9 @@
 </head>
 <body class="uk-height-1-1">
   <div id="app" class="uk-flex uk-flex-column uk-height-1-1">
+    <div id="loader" v-cloak>
+        <i class="uk-icon-spin uk-icon-spinner"></i>
+    </div>
     <div id="user">
       <div v-if="showUser && account">
         <div class="uk-grid">
