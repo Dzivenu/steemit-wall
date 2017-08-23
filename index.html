@@ -210,7 +210,7 @@
           <span v-if="post.first_reblogged_by">(resteemed by <a v-bind:href="'https://steemit.com/@' +  post.first_reblogged_by" target="_blank">{{ post.first_reblogged_by }}</a>)</span>
         </small>
       </h4>
-      <a v-bind:href="'https://steemit.com' +  post.url" target="_blank" class="image" v-bind:style="{ backgroundImage: meta.image ? 'url(' + meta.image[0] + ')' : 'url(/assets/img/steemitwall-default-image.jpg)' }"></a>
+      <a v-bind:href="'https://steemit.com' +  post.url" target="_blank" class="image" v-bind:style="{ backgroundImage: meta.image ? 'url(' + meta.image[0] + ')' : 'url(assets/img/steemitwall-default-image.jpg)' }"></a>
       <div class="uk-grid footer">
         <div class="uk-width-1-3 uk-text-center">
           <i class="uk-icon-angle-up"></i> {{ post.net_votes }}
