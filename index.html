@@ -7,6 +7,8 @@
   <title>Steemit Wall</title>
   <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/uikit/2.27.4/css/uikit.almost-flat.min.css">
   <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/uikit/2.27.4/css/components/tooltip.almost-flat.min.css">
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/uikit/2.27.4/css/components/slider.almost-flat.min.css">
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/jquery.perfect-scrollbar/0.7.0/css/perfect-scrollbar.min.css">
   <link rel="stylesheet" href="assets/css/style.css">
 </head>
 <body class="uk-height-1-1">
@@ -16,26 +18,22 @@
     </div>
     <div id="user">
       <div v-if="showUser && account">
-        <div class="uk-grid">
-          <div class="uk-width-1-4">
-            <a class="username" :href="'https://steemit.com/@' + account.name" target="_blank">@{{ account.name }}</a>
-            <a class="profileimage" :href="'https://steemit.com/@' + account.name" target="_blank" v-bind:style="{ backgroundImage: account.profile.profile_image ? 'url(' + account.profile.profile_image + ')' : 'none' }"></a>
-            <div class="reputation uk-badge">
-              {{ calculateReputation(account.reputation, 2) }}
-            </div>
-          </div>
-          <div class="uk-width-1-4 uk-margin-small-top">
-            <span class="uk-text-muted">Followers: </span>{{ account.followers.follower_count }}<br>
-            <span class="uk-text-muted">Following: </span>{{ account.followers.following_count }}
-          </div>
-          <div class="uk-width-1-4 uk-margin-small-top">
-            <span class="uk-text-muted">Posts and Comments: </span> {{ account.post_count }}<br>
-            <span class="uk-text-muted">Voting Power: </span> {{ calculateVotingPower() }} %
-          </div>
-          <div class="uk-width-1-4">
-            <a href="#" @click="showUser = false" class="uk-button uk-button-primary uk-float-right switch-user"><i class="uk-icon-exchange"></i></a>
-          </div>
+        <a class="username uk-text-truncate" :href="'https://steemit.com/@' + account.name" target="_blank">
+          @{{ account.name }}
+        </a>
+        <a class="profileimage" :href="'https://steemit.com/@' + account.name" target="_blank" v-bind:style="{ backgroundImage: account.profile.profile_image ? 'url(' + account.profile.profile_image + ')' : 'none' }"></a>
+        <div class="reputation" title="Reputation" data-uk-tooltip>
+          {{ reputation }}
         </div>
+        <div class="stats">
+          <span title="Followers" data-uk-tooltip><i class="uk-icon-users"></i> <i class="uk-icon-angle-right"></i> <i class="uk-icon-user"></i> {{ account.followers.follower_count }}</span><br>
+          <span title="Following" data-uk-tooltip><i class="uk-icon-user"></i> <i class="uk-icon-angle-right"></i> <i class="uk-icon-users"></i> {{ account.followers.following_count }}</span>
+        </div>
+        <div class="stats">
+          <span title="Posts and Comments" data-uk-tooltip><i class="uk-icon-comments"></i> {{ account.post_count }}</span><br>
+          <span title="Voting Power" data-uk-tooltip><i v-bind:class="{ 'uk-icon-battery-empty': votingPower < 12.5, 'uk-icon-battery-quater': votingPower >= 12.5 && votingPower < 37.5, 'uk-icon-battery-half': votingPower >= 37.5 && votingPower < 62.5, 'uk-icon-battery-three-quarters': votingPower >= 62.5 && votingPower < 87.5, 'uk-icon-battery-full': votingPower >= 87.5 }"></i> {{ votingPower }} %</span>
+        </div>
+        <a href="#" @click="showUser = false" class="uk-button uk-button-primary uk-float-right switch-user"><i class="uk-icon-exchange"></i></a>
       </div>
       <form class="uk-form uk-margin-remove" v-on:submit="submitUser" v-if="!showUser">
         <div class="uk-form-row">
@@ -50,6 +48,22 @@
         </div>
       </form>
     </div>
+
+    <div data-uk-slider="{infinite: false}" class="uk-height-1-1" id="column-slider">
+      <div class="uk-slider-container uk-height-1-1">
+        <ul class="uk-slider uk-height-1-1" v-bind:class="{'uk-grid-width-medium-1-1': columns.length == 1, 'uk-grid-width-medium-1-2': columns.length == 2, 'uk-grid-width-medium-1-3 uk-grid-width-small-1-2': columns.length == 3, 'uk-grid-width-medium-1-4 uk-grid-width-small-1-2': columns.length >= 4}">
+          <app-column v-for="(column, index) in columns" :type="column.type" :id="column.id" :index="index" :key="index" :columns-count="columns.length"></app-column>
+        </ul>
+      </div>
+    </div>
+
+    <a href="#add-column-modal"
+       data-uk-modal
+       class="add-column-button uk-button uk-button-success uk-width-1-1 uk-flex uk-flex-center uk-flex-middle uk-flex-column"
+       v-bind:class="{'fullscreen': columns.length == 0}">
+      <i class="uk-icon-plus"></i>
+      <span v-if="columns.length == 0">Add Column</span>
+    </a>
 
     <div id="add-column-modal" class="uk-modal">
       <div class="uk-modal-dialog uk-modal-dialog-large">
@@ -164,34 +178,21 @@
         </div>
       </div>
     </div>
-
-    <div class="uk-grid uk-grid-collapse">
-      <app-column v-for="(column, index) in columns" :type="column.type" :id="column.id" :index="index" :key="index" :columns-count="columns.length"></app-column>
-    </div>
-
-    <a href="#add-column-modal"
-       data-uk-modal
-       class="add-column-button uk-button uk-button-success uk-width-1-1 uk-flex uk-flex-center uk-flex-middle uk-flex-column"
-       v-bind:class="{'uk-height-1-1 fullscreen-icon': columns.length == 0}">
-      <i class="uk-icon-plus"></i>
-      <span v-if="columns.length == 0">Add Column</span>
-    </a>
   </div>
 
   <script type="text/x-template" id="app-column-template">
-    <div class="column uk-flex uk-flex-column" v-bind:class="{'uk-width-medium-1-1': columnsCount == 1, 'uk-width-medium-1-2': columnsCount == 2, 'uk-width-medium-1-3': columnsCount == 3, 'uk-width-medium-1-4': columnsCount == 4, 'uk-width-medium-1-5': columnsCount == 5, 'uk-width-medium-1-6': columnsCount >= 6}">
+    <li class="column uk-height-1-1">
       <h3 class="uk-margin-remove uk-text-center">
-        <input type="number" v-model="limit" min="1" max="100" title="number of posts" data-uk-tooltip />
         <span class="label">{{ typeLabel() }}</span>
         <span v-if="id" class="uk-text-muted">
           {{ (type == 'blog' || type == 'feed' ? '@' : '#') + id }}
         </span>
         <a href="#" v-on:click="deleteColumn" class="uk-button uk-button-small uk-button-danger uk-float-right delete-column"><i class="uk-icon-times"></i></a>
       </h3>
-      <div class="posts uk-overflow-container">
+      <div class="posts">
         <app-post v-for="(post, id) in posts" :key="id" :post="post" :meta="JSON.parse(post.json_metadata)">asd</app-post>
       </div>
-    </div>
+    </li>
   </script>
 
   <script type="text/x-template" id="app-post-template">
@@ -228,7 +229,9 @@
   <script type="text/javascript" src="//code.jquery.com/jquery-3.2.1.min.js"></script>
   <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/uikit/2.27.4/js/uikit.min.js"></script>
   <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/uikit/2.27.4/js/components/tooltip.min.js"></script>
+  <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/uikit/2.27.4/js/components/slider.min.js"></script>
   <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.18.1/moment.min.js"></script>
+  <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/jquery.perfect-scrollbar/0.7.0/js/perfect-scrollbar.jquery.min.js"></script>
   <script type="text/javascript" src="//unpkg.com/vue@2.4.2"></script>
   <script type="text/javascript" src="assets/js/app.js"></script>
 </body>

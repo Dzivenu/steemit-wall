@@ -87,16 +87,18 @@ var app = new Vue({
           break;
       }
       saveToLocalStorage('columns', this.columns);
-    },
-    calculateVotingPower: function() {
+    }
+  },
+  computed: {
+    votingPower: function() {
       var secondsPassedSinceLastVote = (new Date - new Date(this.account.last_vote_time + "Z")) / 1000,
           votingPower = this.account.voting_power;
       votingPower += (10000 * secondsPassedSinceLastVote / 432000);
 
       return Math.min(votingPower / 100, 100).toFixed(2);
     },
-    calculateReputation: function(reputation, precision) {
-      return calculateSteemitUserReputation(reputation, precision);
+    reputation: function() {
+      return calculateSteemitUserReputation(this.account.reputation, 1);
     }
   },
   components: {
@@ -171,12 +173,15 @@ var app = new Vue({
             break;
         }
       },
+      mounted: function() {
+        $(this.$el).find('.posts').perfectScrollbar({suppressScrollX: true});
+      },
       components: {
         'app-post': {
           template: '#app-post-template',
           props: ['post', 'meta'],
           methods: {
-            getDate() {
+            getDate: function() {
               return moment.utc(new Date(this.post.created)).from(moment.utc().format('YYYY-MM-DD HH:mm:ss'))
             },
             getPayout: function() {
