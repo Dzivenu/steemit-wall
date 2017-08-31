@@ -1,0 +1,687 @@
+<!DOCTYPE html>
+<html lang="en" class="uk-height-1-1">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="user-scalable=no, width=device-width, initial-scale=1, maximum-scale=1">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>steemDeck</title>
+    <link href="https://fonts.googleapis.com/css?family=Cairo|Lobster|Pacifico" rel="stylesheet">
+    <link rel="stylesheet" href="assets/vendor/uikit/css/uikit.min.css">
+    <link rel="stylesheet" href="assets/vendor/uikit/css/components/tooltip.min.css">
+    <link rel="stylesheet" href="assets/vendor/uikit/css/components/slider.min.css">
+    <link rel="stylesheet" href="assets/vendor/uikit/css/components/sticky.min.css">
+    <link rel="stylesheet" href="assets/vendor/uikit/css/components/dotnav.min.css">
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/jquery.perfect-scrollbar/0.7.0/css/perfect-scrollbar.min.css">
+    <link rel="stylesheet" href="assets/vendor/codemirror/lib/codemirror.css">
+    <link rel="stylesheet" href="assets/vendor/uikit/css/components/htmleditor.min.css">
+
+
+    <link rel="stylesheet" href="assets/css/steemdeck.css">
+</head>
+<body>
+
+<div id="app">
+    <nav class="uk-navbar" id="top-bar" data-uk-sticky>
+        <ul class="uk-navbar-nav">
+            <li class="uk-visible-small uk-parent" data-uk-dropdown="{mode: 'click'}">
+                <a href="#" style="cursor: pointer;"><i class="uk-icon-angle-down"></i></a>
+
+                <!-- This is the dropdown -->
+                <div class="uk-dropdown uk-dropdown-navbar">
+                    <ul class="uk-nav uk-nav-navbar">
+                        <li class="uk-nav-header uk-text-center">
+                            @mkt<br>
+                            <div id="profile-image-big"></div>
+                        </li>
+                        <li class="uk-nav-header uk-text-center uk-margin-remove">
+                            <small>Voting Power</small><br>
+                            92.86 %
+                        </li>
+                        <li class="uk-nav-divider"></li>
+                        <li><a href="#followers" data-uk-modal>Following</a></li>
+                        <li><a href="#replies" data-uk-modal>Replies</a></li>
+                        <li><a href="">Switch User</a></li>
+                    </ul>
+                </div>
+
+            </li>
+            <li>
+                <a href="#" id="profile-image"></a>
+            </li>
+            <li class="uk-hidden-small"><a href="#">@mkt</a></li>
+            <li><span class="uk-badge uk-badge-notification account-reputation">55</span></li>
+            <li>
+                <a href="#followers"
+                   class="uk-navbar-nav-subtitle uk-text-center"
+                   data-uk-modal>
+                    {{ followers }}
+                    <div v-if="newFollowers" class="uk-badge uk-badge-notification">{{ newFollowers }}</div>
+                    <div>Followers</div>
+                </a>
+            </li>
+            <li class="uk-hidden-small">
+                <a href="#followers"
+                   class="uk-navbar-nav-subtitle uk-text-center"
+                   data-uk-modal>
+                    {{ following }}
+                    <div>Following</div>
+                </a>
+            </li>
+            <li class="uk-hidden-small">
+                <a href="#replies"
+                   class="uk-navbar-nav-subtitle uk-text-center"
+                   data-uk-modal>
+                    <i class="uk-icon-comments"></i>
+                    <div v-if="newReplies" class="uk-badge uk-badge-notification">{{ newReplies }}</div>
+                    <div>Replies</div>
+                </a>
+            </li>
+            <li>
+                <a href="#upvotes"
+                   class="uk-navbar-nav-subtitle uk-text-center"
+                   data-uk-modal>
+                    <i class="uk-icon-chevron-up"></i>
+                    <div v-if="newUpvotes" class="uk-badge uk-badge-notification">{{ newUpvotes }}</div>
+                    <div>Upvotes</div>
+                </a>
+            </li>
+            <li class="uk-hidden-small">
+                <a href="#" class="uk-navbar-nav-subtitle uk-text-center">
+                    {{ votingPower }} %
+                    <div>Voting Power</div>
+                </a>
+            </li>
+        </ul>
+        <div class="uk-navbar-content uk-navbar-flip">
+            <a href="#about" id="logo">steemDeck</a>
+        </div>
+    </nav>
+
+    <div id="rows">
+        <div v-for="i in [1,2,3,4,5]" data-uk-slider="{infinite: false, threshold: 50}" class="row">
+            <div class="uk-slider-container" style="position: relative;">
+                <nav class="uk-navbar row-header">
+                    <ul class="uk-navbar-nav">
+                        <li>
+                            <a href="#refresh" class="uk-text-muted">
+                                <i class="uk-icon-refresh"></i>
+                            </a>
+                        </li>
+                    </ul>
+                    <div class="uk-navbar-content uk-text-large row-title uk-padding-remove">
+                        Trending <span class="uk-text-muted">#steemdev</span>
+                    </div>
+                    <ul class="uk-navbar-nav uk-navbar-flip">
+                        <li>
+                            <a href="#move-up" class="uk-text-muted row-sort-handle">
+                                <i class="uk-icon-angle-up"></i>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#move-down" class="uk-text-muted row-sort-handle">
+                                <i class="uk-icon-angle-down"></i>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#close" class="uk-text-muted">
+                                <i class="uk-icon-times"></i>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+                <div class="scroll-indicator-container">
+                    <div class="scroll-indicator"></div>
+                </div>
+                <ul class="uk-slider uk-grid-width-medium-1-2 uk-grid-width-large-1-4">
+                    <li v-for="i in [0,1,2,3,4,5,6,7,8,9]" class="post uk-animation-fade">
+                        <a class="post-image open-post" href="#post" style="background-image: url('https://steemitimages.com/0x0/https://steemitimages.com/DQmZsdpW3fByAX5SsM92ZTGhShyPqkcNHP3QLDXmrwsWG3p/update-generator.png');"></a>
+                        <div class="post-info">
+                            <h3 class="uk-text-truncate uk-margin-remove">
+                                <a href="#post" class="open-post">Widgets Generator: Steemit On Your Website! Now Even Easier!</a>
+                            </h3>
+                            <div class="uk-text-small uk-text-muted">
+                                an hour ago
+                                by <a href="https://steemit.com/@donkeypong" target="_blank">mkt</a>
+                                <span class="reputation">55</span>
+                                in <a href="https://steemit.com/trending/steemdev" target="_blank">steemdev</a>
+                            </div>
+                            <hr class="uk-margin-small-top uk-margin-small-bottom">
+                            <div class="uk-text-muted uk-text-center uk-grid">
+                                <div class="uk-width-1-3">
+                                    $ 69.24
+                                </div>
+                                <div class="uk-width-1-3">
+                                    <i class="uk-icon-angle-up"></i> 54
+                                </div>
+                                <div class="uk-width-1-3">
+                                    <i class="uk-icon-comments"></i> 21
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <nav class="uk-navbar" id="bottom-bar">
+        <div class="uk-navbar-content">
+            <a href="#submit-story" data-uk-modal class="uk-button uk-button-success">
+                <i class="uk-icon-pencil"></i> Submit a Story
+            </a>
+        </div>
+
+        <ul class="uk-navbar-nav uk-navbar-flip">
+            <li>
+                <a href="#settings" data-uk-modal title="Settings" data-uk-tooltip="{pos: 'left'}">
+                    <i class="uk-icon-cog"></i>
+                </a>
+            </li>
+        </ul>
+
+        <div class="uk-navbar-content uk-navbar-flip">
+            <a href="#add-row" data-uk-modal class="uk-button uk-button-success">
+                <i class="uk-icon-plus"></i> Add Row
+            </a>
+        </div>
+    </nav>
+
+    <!-- Modals -->
+
+    <div id="post" class="uk-modal">
+        <div class="uk-modal-dialog">
+            <a class="uk-modal-close uk-close"></a>
+            <div class="uk-modal-header">
+                <h2>Widgets Generator: Steemit On Your Website! Now Even Easier!</h2>
+                <div class="post-info uk-grid">
+                    <div class="uk-width-2-3">
+                        <a href="https://steemit.com/@mkt" class="post-avatar"></a>
+                        <a href="https://steemit.com/@mkt" class="post-author">mkt</a>
+                        <span class="post-author-reputation">55</span>
+                        in <a href="https://steemit.com/@mkt" class="post-category">steemdev</a>
+                    </div>
+                    <div class="uk-width-1-3 uk-text-right">
+                        3 days ago
+                    </div>
+                </div>
+            </div>
+            <div class="post-body">
+                <p><img src="https://steemitimages.com/0x0/https://steemitimages.com/DQmZsdpW3fByAX5SsM92ZTGhShyPqkcNHP3QLDXmrwsWG3p/update-generator.png" alt="update-generator.png"></p>
+                <h3>It is now even easier to display content from steemit.com on your own website!</h3>
+                <h3></h3>
+                <p>On top of my <a href="https://mktcode.github.io/steemit-widgets/index.html" rel="noopener">Widgets Plugin</a> I built a <a href="https://mktcode.github.io/steemit-widgets/generator.html" rel="noopener">generator tool</a>. You can simply choose what content you want to display (profile, blog, feed, new, hot, trending), select a design and adjust some settings and you get a short code at the bottom of the page that you can just paste in your website's HTML.</p>
+                <p><a href="https://mktcode.github.io/steemit-widgets/generator.html" rel="noopener"><img src="https://steemitimages.com/0x0/https://steemitimages.com/DQmaCNBJDodCBZzW5yibS4aAkXwvVT5vMwg93yKb3UDAGSe/generator.png" alt="generator.png"></a></p>
+                <p>You can see an example on my website: <a href="https://markus-kottlaender.de" rel="noopener">https://markus-kottlaender.de</a></p>
+                <p>I think there isn't much explanation needed. The tool is really easy to use. You can choose between two different styles.</p>
+                <p><strong>Default</strong> with adjustable color and border<br>
+                    <strong>Condenser</strong> which just looks like steemit.com</p>
+                <p>Every part of a widget can be shown or hidden. You can even set the precision for reputation and voting power.</p>
+                <p>There are also some minor changes/fixes in the plugin itself. The reputation score is now rounded correctly when using no decimal digits and the authors reputation can now also be displayed in the post template for blog, feed, new, etc. And I'm sure there were some more little adjustments but nothing worth mentioning here.</p>
+                <p>Of course I will continue to improve it over time. Maybe I'll add some more designs and display options. But for now please...</p>
+                <h1><center><a href="https://mktcode.github.io/steemit-widgets/generator.html" rel="noopener">Try it!</a></center></h1>
+                <h1><center>And give me some feedback!<br>If you experience any issues, find a bug or have suggestions PLEASE let me know!</center></h1>
+                <h1></h1>
+                <p>It might well be that there are still some style issues in some browsers or on some websites. In any case make sure to submit your link in the comments if you implemented a widget on your website!</p>
+                <p>If you like it please resteem this post or write your own so the tool can gain some popularity. I'm pretty sure there are enough people with a website out there on steemit who might want to use it. Thanks to <a href="/@finleyexp">@finleyexp</a>, <a href="/@tommycee">@tommycee</a> and <a href="/@pir8aye">@pir8aye</a> for already doing so. Maybe you also want to try the new generator and adjust the output and styling.</p>
+                <p>Also special thanks to <a href="/@transisto">@transisto</a> for supporting me so much and listing my tools on <a href="http://steemtools.com" rel="noopener">steemtools.com</a>.</p>
+                <p>And thank you <a href="/@steemcenterwiki">@steemcenterwiki</a> for listing me on <a href="https://www.steem.center/index.php?title=Steem_Ecosystem:Steemit-Steen" rel="noopener">Steem.center</a>!</p>
+                <p>It feels really great to contribute something to this amazing community and receive so much appreciation in exchange! Thank you!</p>
+                <hr>
+                <p>After <a href="https://steemit.com/steemdev/@mkt/steemit-wall-multifeed-for-steemit-com">Steemit Wall</a> this is the second time I used <a href="https://vuejs.org/" rel="noopener">Vue.js</a> and really.... it's awesome! I definitely make some progress. If you want to take a look at the code visit the <a href="https://github.com/mktcode/steemit-widgets/blob/master/docs/assets/js/generator.js" rel="noopener">github repository</a>.</p>
+                <p>And sorry for not commenting my code... I will add comments later... sometime... :P</p>
+                <hr>
+                <p></p><center><a href="https://steemit.com/@mkt"><img src="https://steemitimages.com/0x0/https://steemitimages.com/0x0/https://steemitimages.com/DQmNv1zxujkKXH4LvDbDCzqQamLHesp1PpocBwPTpMHPdzf/header-logo.png" alt="mkt"></a></center><br>
+                <center>Technology/Science/Future<br>Nature/Environment/Sustainability<br>Creativity/Programming<br><br><sup>shared and original content</sup></center><br>
+                <center><a href="https://steemit.com/introduceyourself/@mkt/i-m-just-a-dreamer">about me</a></center><p></p>
+            </div>
+            <div class="post-tags uk-margin-large-top">
+                <span class="uk-badge">steemdev</span>
+                <span class="uk-badge">steemjs</span>
+                <span class="uk-badge">steemit</span>
+                <span class="uk-badge">website</span>
+                <span class="uk-badge">programming</span>
+            </div>
+            <div class="uk-grid post-info uk-margin-top">
+                <div class="uk-width-2-3">
+                    3 days ago by
+                    <a href="https://steemit.com/@mkt" class="post-author">mkt</a>
+                    <span class="post-author-reputation">55</span>
+                    <span class="uk-margin-small-left uk-margin-small-right">|</span>
+                    $60.50
+                    <span class="uk-margin-small-left uk-margin-small-right">|</span>
+                    56 votes
+                </div>
+                <div class="uk-width-1-3 uk-text-right">
+                    <a href="#" class="uk-margin-small-right">reply</a>
+                    <i class="uk-icon-comments"></i> 21
+                    <i class="uk-icon-eye"></i> 68
+                </div>
+            </div>
+            <hr>
+            <h3>Replies</h3>
+            <div class="post-comments">
+                <ul class="uk-comment-list">
+                    <li>
+                        <article class="uk-comment post-comment">
+                            <header class="uk-comment-header">
+                                <img class="uk-comment-avatar" src="https://getuikit.com/v2/docs/images/placeholder_avatar.svg" alt="">
+                                <h4 class="uk-comment-title">
+                                    Totam laudantium nemo dolorem enim ut et. Veniam blanditiis nesciunt quas vel rem iste. Quasi ipsam repellendus dicta quia illum tempora consequatur cum.
+                                </h4>
+                                <ul class="uk-comment-meta uk-subnav uk-subnav-line">
+                                    <li>by <a href="#">mkt</a> <span class="comment-author-reputation">55</span></li>
+                                    <li>$ 0.01</li>
+                                    <li>1 vote</li>
+                                    <li><a href="#">reply</a></li>
+                                </ul>
+                            </header>
+                        </article>
+                        <ul>
+                            <li>
+                                <article class="uk-comment post-comment">
+                                    <header class="uk-comment-header">
+                                        <img class="uk-comment-avatar" src="https://getuikit.com/v2/docs/images/placeholder_avatar.svg" alt="">
+                                        <h4 class="uk-comment-title">
+                                            Totam laudantium nemo dolorem enim ut et. Veniam blanditiis nesciunt quas vel rem iste. Quasi ipsam repellendus dicta quia illum tempora consequatur cum.
+                                        </h4>
+                                        <ul class="uk-comment-meta uk-subnav uk-subnav-line">
+                                            <li>by <a href="#">mkt</a> <span class="comment-author-reputation">55</span></li>
+                                            <li>$ 0.01</li>
+                                            <li>1 vote</li>
+                                            <li><a href="#">reply</a></li>
+                                        </ul>
+                                    </header>
+                                </article>
+                            </li>
+                        </ul>
+                    </li>
+                    <li>
+                        <article class="uk-comment post-comment">
+                            <header class="uk-comment-header">
+                                <img class="uk-comment-avatar" src="https://getuikit.com/v2/docs/images/placeholder_avatar.svg" alt="">
+                                <h4 class="uk-comment-title">
+                                    Totam laudantium nemo dolorem enim ut et. Veniam blanditiis nesciunt quas vel rem iste. Quasi ipsam repellendus dicta quia illum tempora consequatur cum.
+                                </h4>
+                                <ul class="uk-comment-meta uk-subnav uk-subnav-line">
+                                    <li>by <a href="#">mkt</a> <span class="comment-author-reputation">55</span></li>
+                                    <li>$ 0.01</li>
+                                    <li>1 vote</li>
+                                    <li><a href="#">reply</a></li>
+                                </ul>
+                            </header>
+                        </article>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div id="followers" class="uk-modal">
+        <div class="uk-modal-dialog">
+            <a class="uk-modal-close uk-close"></a>
+            <div class="uk-modal-header">
+                <h3>@mkt's Followers</h3>
+            </div>
+            <div class="uk-modal-header">
+                <form class="uk-form uk-text-center">
+                    <input type="text" placeholder="Search" class="uk-form-large uk-width-1-1">
+                </form>
+            </div>
+            <div style="margin: 0 -20px;">
+                <table class="uk-table uk-table-striped">
+                    <thead>
+                    <tr>
+                        <th></th>
+                        <th>Reputation</th>
+                        <th>Name</th>
+                        <th>Followers/Following</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td class="uk-text-muted uk-text-small">
+                            # 1
+                        </td>
+                        <td><span class="uk-badge uk-badge-notification">62</span></td>
+                        <td>roadscape</td>
+                        <td>2019/428 <b>({{ (2019/428).toFixed(2) }})</b></td>
+                    </tr>
+                    <tr>
+                        <td class="uk-text-muted uk-text-small">
+                            # 2
+                        </td>
+                        <td><span class="uk-badge uk-badge-notification">63</span></td>
+                        <td>fulltimegeek</td>
+                        <td>2076/1145 <b>({{ (2076/1145).toFixed(2) }})</b></td>
+                    </tr>
+                    <tr>
+                        <td class="uk-text-muted uk-text-small">
+                            # 3
+                        </td>
+                        <td><span class="uk-badge uk-badge-notification">75</span></td>
+                        <td>stellabelle</td>
+                        <td>6028/232 <b>({{ (6028/232).toFixed(2) }})</b></td>
+                    </tr>
+                    <tr>
+                        <td class="uk-text-muted uk-text-small">
+                            # 4
+                        </td>
+                        <td><span class="uk-badge uk-badge-notification">73</span></td>
+                        <td>good-karma</td>
+                        <td>7901/150 <b>({{ (7901/150).toFixed(2) }})</b></td>
+                    </tr>
+                    <tr>
+                        <td class="uk-text-muted uk-text-small">
+                            # 5
+                        </td>
+                        <td><span class="uk-badge uk-badge-notification">69</span></td>
+                        <td>teamsteem</td>
+                        <td>6675/1166 <b>({{ (6675/1166).toFixed(2) }})</b></td>
+                    </tr>
+                    <tr>
+                        <td class="uk-text-muted uk-text-small">
+                            # 6
+                        </td>
+                        <td><span class="uk-badge uk-badge-notification">68</span></td>
+                        <td>firepower</td>
+                        <td>9131/32665 <b>({{ (9131/32665).toFixed(2) }})</b></td>
+                    </tr>
+                    <tr>
+                        <td class="uk-text-muted uk-text-small">
+                            # 7
+                        </td>
+                        <td><span class="uk-badge uk-badge-notification">56</span></td>
+                        <td>ghasemkiani</td>
+                        <td>2970/11439 <b>({{ (2970/11439).toFixed(2) }})</b></td>
+                    </tr>
+                    <tr>
+                        <td class="uk-text-muted uk-text-small">
+                            # 8
+                        </td>
+                        <td><span class="uk-badge uk-badge-notification">55</span></td>
+                        <td>eco-alex</td>
+                        <td>861/430 <b>({{ (861/430).toFixed(2) }})</b></td>
+                    </tr>
+                    <tr>
+                        <td class="uk-text-muted uk-text-small">
+                            # 9
+                        </td>
+                        <td><span class="uk-badge uk-badge-notification">60</span></td>
+                        <td>avilsd</td>
+                        <td>9524/77258 <b>({{ (9524/77258).toFixed(2) }})</b></td>
+                    </tr>
+                    <tr>
+                        <td class="uk-text-muted uk-text-small">
+                            # 10
+                        </td>
+                        <td><span class="uk-badge uk-badge-notification">61</span></td>
+                        <td>markwhittam</td>
+                        <td>1258/425 <b>({{ (1258/425).toFixed(2) }})</b></td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+            <ul class="uk-pagination">
+                <li class="uk-disabled"><span><i class="uk-icon-angle-double-left"></i></span></li>
+                <li class="uk-disabled"><span><i class="uk-icon-angle-left"></i></span></li>
+                <li class="uk-active"><span>1</span></li>
+                <li><a href="#">2</a></li>
+                <li><a href="#">3</a></li>
+                <li><a href="#">4</a></li>
+                <li><a href="#">5</a></li>
+                <li><span>...</span></li>
+                <li><a href="#"><i class="uk-icon-angle-right"></i></a></li>
+                <li><a href="#"><i class="uk-icon-angle-double-right"></i></a></li>
+            </ul>
+        </div>
+    </div>
+
+    <div id="upvotes" class="uk-modal">
+        <div class="uk-modal-dialog">
+            <a class="uk-modal-close uk-close"></a>
+            <div class="uk-modal-header">
+                <h3>@mkt's Incoming Upvotes</h3>
+            </div>
+            <div class="uk-modal-header">
+                <form class="uk-form uk-text-center">
+                    <input type="text" placeholder="Search" class="uk-form-large uk-width-1-1">
+                </form>
+            </div>
+            <div style="margin: 0 -20px;">
+                <article class="uk-comment">
+                    <header class="uk-comment-header">
+                        <img class="uk-comment-avatar" src="https://getuikit.com/v2/docs/images/placeholder_avatar.svg" alt="">
+                        <h4 class="uk-comment-title">@mkt upvoted <a href="#">Widgets Generator: Steemit On Your Website! Now Even Easier!</a></h4>
+                        <div class="uk-comment-meta">100%</div>
+                    </header>
+                    <div class="uk-comment-body">...</div>
+                </article>
+            </div>
+            <ul class="uk-pagination">
+                <li class="uk-disabled"><span><i class="uk-icon-angle-double-left"></i></span></li>
+                <li class="uk-disabled"><span><i class="uk-icon-angle-left"></i></span></li>
+                <li class="uk-active"><span>1</span></li>
+                <li><a href="#">2</a></li>
+                <li><a href="#">3</a></li>
+                <li><a href="#">4</a></li>
+                <li><a href="#">5</a></li>
+                <li><span>...</span></li>
+                <li><a href="#"><i class="uk-icon-angle-right"></i></a></li>
+                <li><a href="#"><i class="uk-icon-angle-double-right"></i></a></li>
+            </ul>
+        </div>
+    </div>
+
+    <div id="replies" class="uk-modal">
+        <div class="uk-modal-dialog">
+            <a class="uk-modal-close uk-close"></a>
+            <div class="uk-modal-header">
+                <h3>Replies</h3>
+            </div>
+            <div class="uk-modal-header">
+                <form class="uk-form uk-text-center">
+                    <input type="text" placeholder="Search" class="uk-form-large uk-width-1-1">
+                </form>
+            </div>
+            <div style="margin: 0 -20px;">
+                <article class="uk-comment">
+                    <header class="uk-comment-header">
+                        <img class="uk-comment-avatar" src="https://getuikit.com/v2/docs/images/placeholder_avatar.svg" alt="">
+                        <h4 class="uk-comment-title"><a href="#">Lorem Ipsum dolor sit amet...</a></h4>
+                        <div class="uk-comment-meta"><a href="#">@mkt</a> on Sun 21, June 2017</div>
+                    </header>
+                    <div class="uk-comment-body">...</div>
+                </article>
+            </div>
+            <ul class="uk-pagination">
+                <li class="uk-disabled"><span><i class="uk-icon-angle-double-left"></i></span></li>
+                <li class="uk-disabled"><span><i class="uk-icon-angle-left"></i></span></li>
+                <li class="uk-active"><span>1</span></li>
+                <li><a href="#">2</a></li>
+                <li><a href="#">3</a></li>
+                <li><a href="#">4</a></li>
+                <li><a href="#">5</a></li>
+                <li><span>...</span></li>
+                <li><a href="#"><i class="uk-icon-angle-right"></i></a></li>
+                <li><a href="#"><i class="uk-icon-angle-double-right"></i></a></li>
+            </ul>
+        </div>
+    </div>
+
+    <div id="submit-story" class="uk-modal">
+        <div class="uk-modal-dialog uk-modal-dialog-large">
+            <a class="uk-modal-close uk-close"></a>
+            <div class="uk-modal-header">
+                <h3>Submit a Story</h3>
+            </div>
+            <form class="uk-form">
+                <input type="text" class="uk-form-large uk-width-1-1 uk-margin-bottom" placeholder="Title"/>
+                <textarea data-uk-htmleditor="{markdown:true, mode:'tab'}"></textarea>
+                <input type="text" class="uk-form-large uk-width-1-1 uk-margin-top" placeholder="Tags"/>
+            </form>
+            <div class="uk-modal-footer uk-text-right">
+                <div class="uk-button-group" style="display: inline-block;">
+                    <button class="uk-button">
+                        <i class="uk-icon-calendar"></i>
+                        Date
+                    </button>
+                    <button class="uk-button uk-button-primary uk-active">Now!</button>
+                </div>
+                <a href="#" class="uk-button uk-button-success">
+                    <i class="uk-icon-check"></i> Publish
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div id="settings" class="uk-modal">
+        <div class="uk-modal-dialog">
+            <a class="uk-modal-close uk-close"></a>
+            <div class="uk-modal-header">
+                <h3>Settings</h3>
+            </div>
+        </div>
+    </div>
+
+    <div id="add-row" class="uk-modal">
+        <div class="uk-modal-dialog uk-modal-dialog-large">
+            <a class="uk-modal-close uk-close"></a>
+            <div class="uk-modal-header">
+                <h3>Choose a source of posts:</h3>
+            </div>
+            <div class="uk-grid">
+                <div class="uk-width-medium-1-3">
+                    <div class="uk-panel uk-panel-hover">
+                        <h3 class="uk-panel-title">New<span v-if="addNewTag"> #{{ addNewTag }}</span></h3>
+                        <p class="uk-text-muted">Display new posts for a tag. Leave tag empty to display all new posts.</p>
+                        <form class="uk-form">
+                            <div class="uk-form-row">
+                                <div class="uk-form-controls">
+                                    <div class="uk-form-icon uk-width-1-1">
+                                        <i class="uk-icon-hashtag"></i>
+                                        <input type="text" v-model="addNewTag" placeholder="all" class="uk-width-1-1">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="uk-form-row">
+                                <a href="#" class="uk-button uk-button-success uk-width-1-1">
+                                    Add to Wall
+                                </a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                <div class="uk-width-medium-1-3">
+                    <div class="uk-panel uk-panel-hover">
+                        <h3 class="uk-panel-title">Hot<span v-if="addHotTag"> #{{ addHotTag }}</span></h3>
+                        <p class="uk-text-muted">Display hot posts for a tag. Leave tag empty to display all hot posts.</p>
+                        <form class="uk-form">
+                            <div class="uk-form-row">
+                                <div class="uk-form-controls">
+                                    <div class="uk-form-icon uk-width-1-1">
+                                        <i class="uk-icon-hashtag"></i>
+                                        <input type="text" v-model="addHotTag" placeholder="all" class="uk-width-1-1">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="uk-form-row">
+                                <a href="#" class="uk-button uk-button-success uk-width-1-1">
+                                    Add to Wall
+                                </a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                <div class="uk-width-medium-1-3">
+                    <div class="uk-panel uk-panel-hover">
+                        <h3 class="uk-panel-title">Trending<span v-if="addTrendingTag"> #{{ addTrendingTag }}</span></h3>
+                        <p class="uk-text-muted">Display trending posts for a tag. Leave tag empty to display all trending posts.</p>
+                        <form class="uk-form">
+                            <div class="uk-form-row">
+                                <div class="uk-form-controls">
+                                    <div class="uk-form-icon uk-width-1-1">
+                                        <i class="uk-icon-hashtag"></i>
+                                        <input type="text" v-model="addTrendingTag" placeholder="all" class="uk-width-1-1">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="uk-form-row">
+                                <a href="#" class="uk-button uk-button-success uk-width-1-1">
+                                    Add to Wall
+                                </a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                <div class="uk-width-medium-1-2">
+                    <div class="uk-panel uk-panel-hover">
+                        <h3 class="uk-panel-title">Blog<span v-if="addBlogUser"> @{{ addBlogUser }}</span></h3>
+                        <p class="uk-text-muted">Display posts from a user's blog.</p>
+                        <form class="uk-form">
+                            <div class="uk-form-row">
+                                <div class="uk-form-controls">
+                                    <div class="uk-form-icon uk-width-1-1">
+                                        <i class="uk-icon-at"></i>
+                                        <input type="text" v-model="addBlogUser" placeholder="enter username" class="uk-width-1-1">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="uk-form-row">
+                                <button class="uk-button uk-button-success uk-width-1-1" v-bind:disabled="!addBlogUser">
+                                    Add to Wall
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                <div class="uk-width-medium-1-2">
+                    <div class="uk-panel uk-panel-hover">
+                        <h3 class="uk-panel-title">Feed<span v-if="addFeedUser"> @{{ addFeedUser }}</span></h3>
+                        <p class="uk-text-muted">Display posts from a user's feed.</p>
+                        <form class="uk-form">
+                            <div class="uk-form-row">
+                                <div class="uk-form-controls">
+                                    <div class="uk-form-icon uk-width-1-1">
+                                        <i class="uk-icon-at"></i>
+                                        <input type="text" v-model="addFeedUser" placeholder="enter username" class="uk-width-1-1">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="uk-form-row">
+                                <button class="uk-button uk-button-success uk-width-1-1" v-bind:disabled="!addFeedUser">
+                                    Add to Wall
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+
+<script type="text/javascript" src="//cdn.steemjs.com/lib/latest/steem.min.js"></script>
+<script type="text/javascript" src="assets/vendor/jquery/dist/jquery.min.js"></script>
+<script type="text/javascript" src="assets/vendor/uikit/js/uikit.js"></script>
+<script type="text/javascript" src="assets/vendor/uikit/js/components/tooltip.min.js"></script>
+<script type="text/javascript" src="assets/vendor/uikit/js/components/slider.min.js"></script>
+<script type="text/javascript" src="assets/vendor/uikit/js/components/sticky.min.js"></script>
+<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.18.1/moment.min.js"></script>
+<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/jquery.perfect-scrollbar/0.7.0/js/perfect-scrollbar.jquery.min.js"></script>
+
+
+<script type="text/javascript" src="assets/vendor/codemirror/lib/codemirror.js"></script>
+<script type="text/javascript" src="assets/vendor/codemirror/mode/markdown/markdown.js"></script>
+<script type="text/javascript" src="assets/vendor/codemirror/addon/mode/overlay.js"></script>
+<script type="text/javascript" src="assets/vendor/codemirror/mode/xml/xml.js"></script>
+<script type="text/javascript" src="assets/vendor/codemirror/mode/gfm/gfm.js"></script>
+<script type="text/javascript" src="assets/vendor/marked/marked.min.js"></script>
+<script type="text/javascript" src="assets/vendor/uikit/js/components/htmleditor.min.js"></script>
+
+
+<script type="text/javascript" src="//unpkg.com/vue@2.4.2"></script>
+<script type="text/javascript" src="assets/js/steemdeck.js"></script>
+
+</body>
+</html>
