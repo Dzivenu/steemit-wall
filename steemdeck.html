@@ -103,7 +103,8 @@
                 <nav class="uk-navbar row-header">
                     <ul class="uk-navbar-nav">
                         <li>
-                            <a href="#refresh" class="uk-text-muted">
+                            <a href="#refresh" class="uk-text-muted" title="load new posts" data-uk-tooltip="{pos:'bottom-right'}">
+                                <span v-if="i == 1" class="uk-badge uk-badge-notification uk-margin-small-right">1</span>
                                 <i class="uk-icon-refresh"></i>
                             </a>
                         </li>
