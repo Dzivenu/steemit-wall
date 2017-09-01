@@ -1,18 +1,14 @@
 {
-  "name": "steemwall",
+  "name": "steemitwall",
+  "homepage": "https://github.com/mktcode/steemit-wall",
   "authors": [
     "mktcode <kontakt@markus-kottlaender.de>"
   ],
-  "description": "A cusomtizable steemit.com multi feed.",
-  "main": "",
-  "license": "MIT",
-  "homepage": "",
-  "ignore": [
-    "**/.*",
-    "node_modules",
-    "bower_components",
-    "assets/vendor",
-    "test",
-    "tests"
-  ]
+  "description": "A customizable multi feed for steem!",
+  "dependencies": {
+    "uikit": "^2.27.4",
+    "vue": "^2.4.2",
+    "codemirror": "^5.27.4",
+    "marked": "^0.3.6"
+  }
 }
