@@ -78,6 +78,33 @@ body * {
     text-decoration: none;
 }
 
+#about a {
+    color: #444;
+    text-decoration: none;
+}
+
+#about a:hover {
+    text-decoration: none;
+}
+
+#about-avatar {
+    width: 60px;
+    height: 60px;
+    margin: 0 auto;
+    background: url(https://steemitimages.com/DQmRbn1yZHxN4JsHi5qdKVz99QtFLSHZT8jyxBrNbt6HoJy/steemit-profile.png) center center;
+    background-size: cover;
+    display: block;
+}
+
+#about-logo {
+    color: #00a8e6;
+    text-shadow: 3px 3px 3px rgba(0, 0, 0, .2);
+    line-height: 45px;
+    font-size: 35px;
+    font-family: 'Lobster', cursive;
+    text-align: center;
+}
+
 #add-row-big {
     position: absolute;
     top: 50px;
