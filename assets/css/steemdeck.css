@@ -14,6 +14,7 @@ body * {
     border-bottom: none;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
     background: #f5f5f5;
+    z-index: 2;
 }
 
 #top-bar .uk-navbar-nav > li > a {
@@ -68,6 +69,7 @@ body * {
     font-size: 25px;
     font-family: 'Lobster', cursive;
     transition: color .5s ease, text-shadow .5s ease;
+    display: inline-block;
 }
 
 #logo:hover {
@@ -76,12 +78,37 @@ body * {
     text-decoration: none;
 }
 
+#add-row-big {
+    position: absolute;
+    top: 50px;
+    left: 10px;
+    right: 10px;
+    height: 270px;
+    box-shadow: rgba(0, 0, 0, 0.3) 3px 3px 10px;
+}
+
+#add-row-big a {
+    height: 100%;
+    font-size: 40px;
+    line-height: 270px;
+}
+
+#info-text {
+    font-size: 25px;
+    line-height: 32px;
+    color: #ccc;
+    text-align: center;
+}
+
 #rows {
     padding: 10px;
 }
 
-#rows > div {
+#rows .row {
+    transition: all 1s;
     margin-bottom: 10px;
+    z-index: 1;
+    box-shadow: rgba(0, 0, 0, 0.5) 3px 3px 10px;
 }
 
 .row-nav {
@@ -225,6 +252,29 @@ body * {
     transition: opacity .5s
 }
 
-.fade-enter, .fade-leave-to /* .fade-leave-active below version 2.1.8 */ {
+.fade-enter, .fade-leave-to {
     opacity: 0
+}
+
+.rows-enter, .rows-leave-to {
+    opacity: 0;
+    transform: translateY(-30px);
+}
+.rows-leave-active {
+    position: absolute;
+}
+
+.row-move {
+    transition: transform 1s;
+}
+
+/**
+ * Responsive
+ */
+
+@media (max-width: 767px) {
+    #logo {
+        line-height: 19px;
+        font-size: 19px;
+    }
 }

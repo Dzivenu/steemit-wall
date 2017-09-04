@@ -19,15 +19,34 @@
     <link rel="stylesheet" href="assets/css/steemdeck.css">
 </head>
 <body>
-
 <div id="app">
     <sd-top-bar></sd-top-bar>
 
-    <div id="rows">
-        <sd-row v-for="(row, key) in rows" v-bind:row="row" v-bind:key="key"></sd-row>
-    </div>
+    <transition name="fade">
+        <div v-if="rows.length == 0" id="add-row-big">
+            <a href="#add-row" class="uk-button uk-button-large uk-button-success uk-width-1-1 uk-display-block"
+               data-uk-modal>
+                <i class="uk-icon-plus"></i> Add Row<br>
+            </a>
+            <div id="info-text" class="uk-width-medium-1-2 uk-push-1-4 uk-margin-top uk-margin-bottom">
+                Add a user's blog or feed or the trending page for a given tag or all new posts. Or just all of them. You can add multiple rows!
+            </div>
+        </div>
+    </transition>
 
-    <sd-bottom-bar></sd-bottom-bar>
+    <transition-group name="rows" tag="div" id="rows">
+        <sd-row v-for="(row, key) in rows"
+                v-bind:rows="rows"
+                v-bind:row="row"
+                v-bind:index="key"
+                v-bind:key="row.id"
+                v-on:remove="removeRow(key, $event)"
+                v-on:up="rowUp(key)"
+                v-on:down="rowDown(key)">
+        </sd-row>
+    </transition-group>
+
+    <sd-bottom-bar v-bind:rows="rows"></sd-bottom-bar>
 
     <!-- Modals -->
 
@@ -393,19 +412,20 @@
                     <div class="uk-panel uk-panel-hover">
                         <h3 class="uk-panel-title">New<span v-if="addNewTag"> #{{ addNewTag }}</span></h3>
                         <p class="uk-text-muted">Display new posts for a tag. Leave tag empty to display all new posts.</p>
-                        <form class="uk-form">
+                        <form class="uk-form" v-on:submit="addRow('new', $event)">
                             <div class="uk-form-row">
                                 <div class="uk-form-controls">
                                     <div class="uk-form-icon uk-width-1-1">
                                         <i class="uk-icon-hashtag"></i>
-                                        <input type="text" v-model="addNewTag" placeholder="all" class="uk-width-1-1">
+                                        <input type="text" v-model="addNewTag" placeholder="all" class="uk-width-1-1 uk-form-large">
                                     </div>
                                 </div>
                             </div>
-                            <div class="uk-form-row">
-                                <a href="#" class="uk-button uk-button-success uk-width-1-1">
-                                    Add to Wall
-                                </a>
+                            <div class="uk-form-row uk-text-center">
+                                <button href="#" class="uk-button uk-button-success uk-button-large">
+                                    <i class="uk-icon-plus"></i>
+                                    Add Row
+                                </button>
                             </div>
                         </form>
                     </div>
@@ -414,19 +434,20 @@
                     <div class="uk-panel uk-panel-hover">
                         <h3 class="uk-panel-title">Hot<span v-if="addHotTag"> #{{ addHotTag }}</span></h3>
                         <p class="uk-text-muted">Display hot posts for a tag. Leave tag empty to display all hot posts.</p>
-                        <form class="uk-form">
+                        <form class="uk-form" v-on:submit="addRow('hot', $event)">
                             <div class="uk-form-row">
                                 <div class="uk-form-controls">
                                     <div class="uk-form-icon uk-width-1-1">
                                         <i class="uk-icon-hashtag"></i>
-                                        <input type="text" v-model="addHotTag" placeholder="all" class="uk-width-1-1">
+                                        <input type="text" v-model="addHotTag" placeholder="all" class="uk-width-1-1 uk-form-large">
                                     </div>
                                 </div>
                             </div>
-                            <div class="uk-form-row">
-                                <a href="#" class="uk-button uk-button-success uk-width-1-1">
-                                    Add to Wall
-                                </a>
+                            <div class="uk-form-row uk-text-center">
+                                <button href="#" class="uk-button uk-button-success uk-button-large">
+                                    <i class="uk-icon-plus"></i>
+                                    Add Row
+                                </button>
                             </div>
                         </form>
                     </div>
@@ -435,19 +456,20 @@
                     <div class="uk-panel uk-panel-hover">
                         <h3 class="uk-panel-title">Trending<span v-if="addTrendingTag"> #{{ addTrendingTag }}</span></h3>
                         <p class="uk-text-muted">Display trending posts for a tag. Leave tag empty to display all trending posts.</p>
-                        <form class="uk-form">
+                        <form class="uk-form" v-on:submit="addRow('trending', $event)">
                             <div class="uk-form-row">
                                 <div class="uk-form-controls">
                                     <div class="uk-form-icon uk-width-1-1">
                                         <i class="uk-icon-hashtag"></i>
-                                        <input type="text" v-model="addTrendingTag" placeholder="all" class="uk-width-1-1">
+                                        <input type="text" v-model="addTrendingTag" placeholder="all" class="uk-width-1-1 uk-form-large">
                                     </div>
                                 </div>
                             </div>
-                            <div class="uk-form-row">
-                                <a href="#" class="uk-button uk-button-success uk-width-1-1">
-                                    Add to Wall
-                                </a>
+                            <div class="uk-form-row uk-text-center">
+                                <button href="#" class="uk-button uk-button-success uk-button-large">
+                                    <i class="uk-icon-plus"></i>
+                                    Add Row
+                                </button>
                             </div>
                         </form>
                     </div>
@@ -456,18 +478,19 @@
                     <div class="uk-panel uk-panel-hover">
                         <h3 class="uk-panel-title">Blog<span v-if="addBlogUser"> @{{ addBlogUser }}</span></h3>
                         <p class="uk-text-muted">Display posts from a user's blog.</p>
-                        <form class="uk-form">
+                        <form class="uk-form" v-on:submit="addRow('blog', $event)">
                             <div class="uk-form-row">
                                 <div class="uk-form-controls">
                                     <div class="uk-form-icon uk-width-1-1">
                                         <i class="uk-icon-at"></i>
-                                        <input type="text" v-model="addBlogUser" placeholder="enter username" class="uk-width-1-1">
+                                        <input type="text" v-model="addBlogUser" placeholder="enter username" class="uk-width-1-1 uk-form-large">
                                     </div>
                                 </div>
                             </div>
-                            <div class="uk-form-row">
-                                <button class="uk-button uk-button-success uk-width-1-1" v-bind:disabled="!addBlogUser">
-                                    Add to Wall
+                            <div class="uk-form-row uk-text-center">
+                                <button class="uk-button uk-button-success uk-button-large" v-bind:disabled="!addBlogUser">
+                                    <i class="uk-icon-plus"></i>
+                                    Add Row
                                 </button>
                             </div>
                         </form>
@@ -477,18 +500,19 @@
                     <div class="uk-panel uk-panel-hover">
                         <h3 class="uk-panel-title">Feed<span v-if="addFeedUser"> @{{ addFeedUser }}</span></h3>
                         <p class="uk-text-muted">Display posts from a user's feed.</p>
-                        <form class="uk-form">
+                        <form class="uk-form" v-on:submit="addRow('feed', $event)">
                             <div class="uk-form-row">
                                 <div class="uk-form-controls">
                                     <div class="uk-form-icon uk-width-1-1">
                                         <i class="uk-icon-at"></i>
-                                        <input type="text" v-model="addFeedUser" placeholder="enter username" class="uk-width-1-1">
+                                        <input type="text" v-model="addFeedUser" placeholder="enter username" class="uk-width-1-1 uk-form-large">
                                     </div>
                                 </div>
                             </div>
-                            <div class="uk-form-row">
-                                <button class="uk-button uk-button-success uk-width-1-1" v-bind:disabled="!addFeedUser">
-                                    Add to Wall
+                            <div class="uk-form-row uk-text-center">
+                                <button class="uk-button uk-button-success uk-button-large" v-bind:disabled="!addFeedUser">
+                                    <i class="uk-icon-plus"></i>
+                                    Add Row
                                 </button>
                             </div>
                         </form>
@@ -599,7 +623,7 @@
             </div>
         </transition>
         <div class="uk-navbar-content uk-navbar-flip" style="padding-left: 0;">
-            <a href="#about" id="logo">steemDeck</a>
+            <a href="#about" id="logo">steem<br class="uk-visible-small">Deck</a>
         </div>
     </nav>
 </script>
@@ -617,21 +641,21 @@
                     </li>
                 </ul>
                 <div class="uk-navbar-content uk-text-large row-title uk-padding-remove">
-                    Trending <span class="uk-text-muted">#steemdev</span>
+                    {{ row.type }} <span class="uk-text-muted">#{{ row.tag }}</span>
                 </div>
                 <ul class="uk-navbar-nav uk-navbar-flip">
                     <li>
-                        <a href="#move-up" class="uk-text-muted row-sort-handle">
+                        <a v-if="index != 0" href="#move-up" class="uk-text-muted row-sort-handle" v-on:click="$emit('up')">
                             <i class="uk-icon-angle-up"></i>
                         </a>
                     </li>
                     <li>
-                        <a href="#move-down" class="uk-text-muted row-sort-handle">
+                        <a v-if="index != rows.length - 1" href="#move-down" class="uk-text-muted row-sort-handle" v-on:click="$emit('down')">
                             <i class="uk-icon-angle-down"></i>
                         </a>
                     </li>
                     <li>
-                        <a href="#close" class="uk-text-muted">
+                        <a href="#close" class="uk-text-muted" v-on:click="$emit('remove', $event)">
                             <i class="uk-icon-times"></i>
                         </a>
                     </li>
@@ -688,17 +712,20 @@
             </li>
         </ul>
 
-        <div class="uk-navbar-content uk-navbar-flip">
-            <a href="#add-row" data-uk-modal class="uk-button uk-button-success">
-                <i class="uk-icon-plus"></i> Add Row
-            </a>
-        </div>
+        <transition name="fade">
+            <div v-if="rows.length != 0" class="uk-navbar-content uk-navbar-flip">
+                <a href="#add-row" data-uk-modal class="uk-button uk-button-success">
+                    <i class="uk-icon-plus"></i> Add Row
+                </a>
+            </div>
+        </transition>
     </nav>
 </script>
 
 <!-- Scripts -->
 
 <script type="text/javascript" src="//cdn.steemjs.com/lib/latest/steem.min.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.14.1/lodash.min.js"></script>
 <script type="text/javascript" src="assets/vendor/jquery/dist/jquery.min.js"></script>
 <script type="text/javascript" src="assets/vendor/uikit/js/uikit.js"></script>
 <script type="text/javascript" src="assets/vendor/uikit/js/components/tooltip.min.js"></script>

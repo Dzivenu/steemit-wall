@@ -2,17 +2,18 @@ let steemDeck = new Vue({
     el: '#app',
     data: {
         account: null,
-        rows: {
-            0: {
-                type: 'trending',
-                tag: 'steemdev'
-            }
-        },
         addNewTag: null,
         addHotTag: null,
         addTrendingTag: null,
         addBlogUser: null,
-        addFeedUser: null
+        addFeedUser: null,
+        rows: [],
+        newRowId: 3,
+    },
+    created: function () {
+        if (loadFromLocalStorage('rows')) {
+            this.rows = loadFromLocalStorage('rows');
+        }
     },
     methods: {
         resetNewFollowers: function () {
@@ -23,6 +24,45 @@ let steemDeck = new Vue({
         },
         resetNewUpvotes: function () {
             this.newUpvotes = 0;
+        },
+        addRow: function (type, e) {
+            e.preventDefault();
+            UIkit.modal("#add-row").hide();
+            switch (type) {
+                case 'new':
+                    this.rows.unshift({id: this.newRowId++, type: 'new', tag: this.addNewTag});
+                    break;
+                case 'hot':
+                    this.rows.unshift({id: this.newRowId++, type: 'hot', tag: this.addHotTag});
+                    break;
+                case 'trending':
+                    this.rows.unshift({id: this.newRowId++, type: 'trending', tag: this.addTrendingTag});
+                    break;
+                case 'blog':
+                    this.rows.unshift({id: this.newRowId++, type: 'blog', tag: this.addBlogUser});
+                    break;
+                case 'feed':
+                    this.rows.unshift({id: this.newRowId++, type: 'feed', tag: this.addFeedUser});
+                    break;
+            }
+            saveToLocalStorage('rows', this.rows);
+        },
+        removeRow: function (key, $event) {
+            $($event.target).parents('.row').css('max-width', $($event.target).parents('.row').outerWidth());
+            this.rows.splice(key, 1);
+            saveToLocalStorage('rows', this.rows);
+        },
+        rowUp: function (key) {
+            if (key > 0) {
+                this.rows[key] = this.rows.splice(key - 1, 1, this.rows[key])[0];
+                saveToLocalStorage('rows', this.rows);
+            }
+        },
+        rowDown: function (key) {
+            if (key < this.rows.length - 1) {
+                this.rows[key] = this.rows.splice(key + 1, 1, this.rows[key])[0];
+                saveToLocalStorage('rows', this.rows);
+            }
         }
     },
     components: {
@@ -130,14 +170,27 @@ let steemDeck = new Vue({
             },
         },
         'sd-bottom-bar': {
-            template: '#bottom-bar-template'
+            template: '#bottom-bar-template',
+            props: ['rows']
         },
         'sd-row': {
             template: '#row-template',
-            props: ['row']
+            props: ['rows', 'row', 'index']
         }
     }
 });
+
+function saveToLocalStorage(key, value) {
+    if (typeof(Storage) !== "undefined") {
+        localStorage.setItem(key, JSON.stringify(value));
+    }
+}
+
+function loadFromLocalStorage(key) {
+    if (typeof(Storage) !== "undefined") {
+        return JSON.parse(localStorage.getItem(key));
+    }
+}
 
 function calculateReputation(reputation, precision) {
     let score = (reputation < 0 ? '-' : '') + ((((Math.log10(Math.abs(reputation))) - 9) * 9) + 25);
