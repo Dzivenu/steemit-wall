@@ -21,171 +21,13 @@
 <body>
 
 <div id="app">
-    <nav class="uk-navbar" id="top-bar" data-uk-sticky>
-        <ul class="uk-navbar-nav">
-            <li class="uk-visible-small uk-parent" data-uk-dropdown="{mode: 'click'}">
-                <a href="#" style="cursor: pointer;"><i class="uk-icon-angle-down"></i></a>
-
-                <!-- This is the dropdown -->
-                <div class="uk-dropdown uk-dropdown-navbar">
-                    <ul class="uk-nav uk-nav-navbar">
-                        <li class="uk-nav-header uk-text-center">
-                            @mkt<br>
-                            <div id="profile-image-big"></div>
-                        </li>
-                        <li class="uk-nav-header uk-text-center uk-margin-remove">
-                            <small>Voting Power</small><br>
-                            92.86 %
-                        </li>
-                        <li class="uk-nav-divider"></li>
-                        <li><a href="#followers" data-uk-modal>Following</a></li>
-                        <li><a href="#replies" data-uk-modal>Replies</a></li>
-                        <li><a href="">Switch User</a></li>
-                    </ul>
-                </div>
-
-            </li>
-            <li>
-                <a href="#" id="profile-image"></a>
-            </li>
-            <li class="uk-hidden-small"><a href="#">@mkt</a></li>
-            <li><span class="uk-badge uk-badge-notification account-reputation">55</span></li>
-            <li>
-                <a href="#followers"
-                   class="uk-navbar-nav-subtitle uk-text-center"
-                   data-uk-modal>
-                    {{ followers }}
-                    <div v-if="newFollowers" class="uk-badge uk-badge-notification">{{ newFollowers }}</div>
-                    <div>Followers</div>
-                </a>
-            </li>
-            <li class="uk-hidden-small">
-                <a href="#followers"
-                   class="uk-navbar-nav-subtitle uk-text-center"
-                   data-uk-modal>
-                    {{ following }}
-                    <div>Following</div>
-                </a>
-            </li>
-            <li class="uk-hidden-small">
-                <a href="#replies"
-                   class="uk-navbar-nav-subtitle uk-text-center"
-                   data-uk-modal>
-                    <i class="uk-icon-comments"></i>
-                    <div v-if="newReplies" class="uk-badge uk-badge-notification">{{ newReplies }}</div>
-                    <div>Replies</div>
-                </a>
-            </li>
-            <li>
-                <a href="#upvotes"
-                   class="uk-navbar-nav-subtitle uk-text-center"
-                   data-uk-modal>
-                    <i class="uk-icon-chevron-up"></i>
-                    <div v-if="newUpvotes" class="uk-badge uk-badge-notification">{{ newUpvotes }}</div>
-                    <div>Upvotes</div>
-                </a>
-            </li>
-            <li class="uk-hidden-small">
-                <a href="#" class="uk-navbar-nav-subtitle uk-text-center">
-                    {{ votingPower }} %
-                    <div>Voting Power</div>
-                </a>
-            </li>
-        </ul>
-        <div class="uk-navbar-content uk-navbar-flip" style="padding-left: 0;">
-            <a href="#about" id="logo">steemDeck</a>
-        </div>
-    </nav>
+    <sd-top-bar></sd-top-bar>
 
     <div id="rows">
-        <div v-for="i in [1,2,3,4,5]" data-uk-slider="{infinite: false, threshold: 50}" class="row">
-            <div class="uk-slider-container" style="position: relative;">
-                <nav class="uk-navbar row-header">
-                    <ul class="uk-navbar-nav">
-                        <li>
-                            <a href="#refresh" class="uk-text-muted" title="load new posts" data-uk-tooltip="{pos:'bottom-right'}">
-                                <span v-if="i == 1" class="uk-badge uk-badge-notification uk-margin-small-right">1</span>
-                                <i class="uk-icon-refresh"></i>
-                            </a>
-                        </li>
-                    </ul>
-                    <div class="uk-navbar-content uk-text-large row-title uk-padding-remove">
-                        Trending <span class="uk-text-muted">#steemdev</span>
-                    </div>
-                    <ul class="uk-navbar-nav uk-navbar-flip">
-                        <li>
-                            <a href="#move-up" class="uk-text-muted row-sort-handle">
-                                <i class="uk-icon-angle-up"></i>
-                            </a>
-                        </li>
-                        <li>
-                            <a href="#move-down" class="uk-text-muted row-sort-handle">
-                                <i class="uk-icon-angle-down"></i>
-                            </a>
-                        </li>
-                        <li>
-                            <a href="#close" class="uk-text-muted">
-                                <i class="uk-icon-times"></i>
-                            </a>
-                        </li>
-                    </ul>
-                </nav>
-                <div class="scroll-indicator-container">
-                    <div class="scroll-indicator"></div>
-                </div>
-                <ul class="uk-slider uk-grid-width-medium-1-2 uk-grid-width-large-1-4">
-                    <li v-for="i in [0,1,2,3,4,5,6,7,8,9]" class="post uk-animation-fade">
-                        <a class="post-image open-post" href="#post" style="background-image: url('https://steemitimages.com/0x0/https://steemitimages.com/DQmZsdpW3fByAX5SsM92ZTGhShyPqkcNHP3QLDXmrwsWG3p/update-generator.png');"></a>
-                        <div class="post-info">
-                            <h3 class="uk-text-truncate uk-margin-remove">
-                                <a href="#post" class="open-post">Widgets Generator: Steemit On Your Website! Now Even Easier!</a>
-                            </h3>
-                            <div class="uk-text-small uk-text-muted">
-                                an hour ago
-                                by <a href="https://steemit.com/@donkeypong" target="_blank">mkt</a>
-                                <span class="reputation">55</span>
-                                in <a href="https://steemit.com/trending/steemdev" target="_blank">steemdev</a>
-                            </div>
-                            <hr class="uk-margin-small-top uk-margin-small-bottom">
-                            <div class="uk-text-muted uk-text-center uk-grid">
-                                <div class="uk-width-1-3">
-                                    $ 69.24
-                                </div>
-                                <div class="uk-width-1-3">
-                                    <i class="uk-icon-angle-up"></i> 54
-                                </div>
-                                <div class="uk-width-1-3">
-                                    <i class="uk-icon-comments"></i> 21
-                                </div>
-                            </div>
-                        </div>
-                    </li>
-                </ul>
-            </div>
-        </div>
+        <sd-row v-for="(row, key) in rows" v-bind:row="row" v-bind:key="key"></sd-row>
     </div>
 
-    <nav class="uk-navbar" id="bottom-bar">
-        <div class="uk-navbar-content">
-            <a href="#submit-story" data-uk-modal class="uk-button uk-button-success">
-                <i class="uk-icon-pencil"></i> Submit a Story
-            </a>
-        </div>
-
-        <ul class="uk-navbar-nav uk-navbar-flip">
-            <li>
-                <a href="#settings" data-uk-modal title="Settings" data-uk-tooltip="{pos: 'left'}">
-                    <i class="uk-icon-cog"></i>
-                </a>
-            </li>
-        </ul>
-
-        <div class="uk-navbar-content uk-navbar-flip">
-            <a href="#add-row" data-uk-modal class="uk-button uk-button-success">
-                <i class="uk-icon-plus"></i> Add Row
-            </a>
-        </div>
-    </nav>
+    <sd-bottom-bar></sd-bottom-bar>
 
     <!-- Modals -->
 
@@ -656,7 +498,205 @@
         </div>
     </div>
 </div>
-</div>
+
+<!-- Templates -->
+
+<script type="text/x-template" id="top-bar-template">
+    <nav class="uk-navbar" id="top-bar" data-uk-sticky>
+        <transition name="fade">
+            <ul v-if="userInfo.account" class="uk-navbar-nav uk-position-top-left">
+                <li class="uk-visible-small uk-parent" data-uk-dropdown="{mode: 'click'}">
+                    <a href="#" style="cursor: pointer;"><i class="uk-icon-angle-down"></i></a>
+
+                    <!-- This is the dropdown -->
+                    <div class="uk-dropdown uk-dropdown-navbar">
+                        <ul class="uk-nav uk-nav-navbar">
+                            <li class="uk-nav-header uk-text-center">
+                                @{{ userInfo.username }}<br>
+                                <div id="profile-image-big"></div>
+                            </li>
+                            <li class="uk-nav-header uk-text-center uk-margin-remove">
+                                <small>Voting Power</small><br>
+                                92.86 %
+                            </li>
+                            <li class="uk-nav-divider"></li>
+                            <li><a href="#followers" data-uk-modal>Following</a></li>
+                            <li><a href="#replies" data-uk-modal>Replies</a></li>
+                            <li><a href="">Switch User</a></li>
+                        </ul>
+                    </div>
+
+                </li>
+                <li v-if="userInfo.profileImage">
+                    <a href="#" id="profile-image" v-bind:style="'background-image: url(https://steemitimages.com/50x50/' + userInfo.profileImage + ')'"></a>
+                </li>
+                <li class="uk-hidden-small"><a href="#">@{{ userInfo.username }}</a></li>
+                <li><span class="uk-badge uk-badge-notification account-reputation">{{ userInfo.reputation }}</span></li>
+                <li>
+                    <a href="#followers"
+                       class="uk-navbar-nav-subtitle uk-text-center"
+                       data-uk-modal>
+                        {{ userInfo.followers }}
+                        <div v-if="userInfo.newFollowers" class="uk-badge uk-badge-notification">{{ userInfo.newFollowers }}</div>
+                        <div>Followers</div>
+                    </a>
+                </li>
+                <li class="uk-hidden-small">
+                    <a href="#followers"
+                       class="uk-navbar-nav-subtitle uk-text-center"
+                       data-uk-modal>
+                        {{ userInfo.following }}
+                        <div>Following</div>
+                    </a>
+                </li>
+                <li class="uk-hidden-small">
+                    <a href="#"
+                       class="uk-navbar-nav-subtitle uk-text-center"
+                       data-uk-modal>
+                        {{ userInfo.posts }}
+                        <div>Posts</div>
+                    </a>
+                </li>
+                <li class="uk-hidden-small">
+                    <a href="#replies"
+                       class="uk-navbar-nav-subtitle uk-text-center"
+                       data-uk-modal>
+                        <i class="uk-icon-comments"></i>
+                        <div v-if="userInfo.newReplies" class="uk-badge uk-badge-notification">{{ userInfo.newReplies }}</div>
+                        <div>Replies</div>
+                    </a>
+                </li>
+                <li>
+                    <a href="#upvotes"
+                       class="uk-navbar-nav-subtitle uk-text-center"
+                       data-uk-modal>
+                        <i class="uk-icon-chevron-up"></i>
+                        <div v-if="userInfo.newUpvotes" class="uk-badge uk-badge-notification">{{ userInfo.newUpvotes }}</div>
+                        <div>Upvotes</div>
+                    </a>
+                </li>
+                <li class="uk-hidden-small">
+                    <a href="#" class="uk-navbar-nav-subtitle uk-text-center">
+                        {{ userInfo.votingPower }} %
+                        <div>Voting Power</div>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" v-on:click="resetAccount" id="reset-user" data-uk-tooltip title="switch user">
+                        <i class="uk-icon-times"></i>
+                    </a>
+                </li>
+            </ul>
+        </transition>
+        <transition name="fade">
+            <div v-if="!userInfo.account" class="uk-navbar-content uk-position-top-left">
+                <form class="uk-form uk-display-inline-block" id="username-form" v-on:submit="setUserInfo($event)">
+                    <input type="search" placeholder="Enter username" v-model="usernameQuery" v-on:keyup="lookupAccount" autocomplete="off">
+                    <span v-if="!accountTmp && usernameQuery && !lookingUpAccount" class="uk-margin-left"><i class="uk-icon-times uk-text-danger"></i></span>
+                    <span v-if="!accountTmp && usernameQuery && lookingUpAccount" class="uk-margin-left"><i class="uk-icon-spinner uk-icon-spin"></i></span>
+                    <button v-if="accountTmp && !lookingUpAccount" class="uk-button uk-button-success"><i class="uk-icon-check"></i></button>
+                </form>
+            </div>
+        </transition>
+        <div class="uk-navbar-content uk-navbar-flip" style="padding-left: 0;">
+            <a href="#about" id="logo">steemDeck</a>
+        </div>
+    </nav>
+</script>
+
+<script type="text/x-template" id="row-template">
+    <div data-uk-slider="{infinite: false, threshold: 50}" class="row">
+        <div class="uk-slider-container" style="position: relative;">
+            <nav class="uk-navbar row-header">
+                <ul class="uk-navbar-nav">
+                    <li>
+                        <a href="#refresh" class="uk-text-muted" title="load new posts" data-uk-tooltip="{pos:'bottom-right'}">
+                            <span v-if="true" class="uk-badge uk-badge-notification uk-margin-small-right">1</span>
+                            <i class="uk-icon-refresh"></i>
+                        </a>
+                    </li>
+                </ul>
+                <div class="uk-navbar-content uk-text-large row-title uk-padding-remove">
+                    Trending <span class="uk-text-muted">#steemdev</span>
+                </div>
+                <ul class="uk-navbar-nav uk-navbar-flip">
+                    <li>
+                        <a href="#move-up" class="uk-text-muted row-sort-handle">
+                            <i class="uk-icon-angle-up"></i>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#move-down" class="uk-text-muted row-sort-handle">
+                            <i class="uk-icon-angle-down"></i>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#close" class="uk-text-muted">
+                            <i class="uk-icon-times"></i>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+            <div class="scroll-indicator-container">
+                <div class="scroll-indicator"></div>
+            </div>
+            <ul class="uk-slider uk-grid-width-medium-1-2 uk-grid-width-large-1-4">
+                <li v-for="i in [0,1,2,3,4,5,6,7,8,9]" class="post uk-animation-fade">
+                    <a class="post-image open-post" href="#post" style="background-image: url('https://steemitimages.com/0x0/https://steemitimages.com/DQmZsdpW3fByAX5SsM92ZTGhShyPqkcNHP3QLDXmrwsWG3p/update-generator.png');"></a>
+                    <div class="post-info">
+                        <h3 class="uk-text-truncate uk-margin-remove">
+                            <a href="#post" class="open-post">Widgets Generator: Steemit On Your Website! Now Even Easier!</a>
+                        </h3>
+                        <div class="uk-text-small uk-text-muted">
+                            an hour ago
+                            by <a href="https://steemit.com/@donkeypong" target="_blank">mkt</a>
+                            <span class="reputation">55</span>
+                            in <a href="https://steemit.com/trending/steemdev" target="_blank">steemdev</a>
+                        </div>
+                        <hr class="uk-margin-small-top uk-margin-small-bottom">
+                        <div class="uk-text-muted uk-text-center uk-grid">
+                            <div class="uk-width-1-3">
+                                $ 69.24
+                            </div>
+                            <div class="uk-width-1-3">
+                                <i class="uk-icon-angle-up"></i> 54
+                            </div>
+                            <div class="uk-width-1-3">
+                                <i class="uk-icon-comments"></i> 21
+                            </div>
+                        </div>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </div>
+</script>
+
+<script type="text/x-template" id="bottom-bar-template">
+    <nav class="uk-navbar" id="bottom-bar">
+        <div class="uk-navbar-content">
+            <a href="#submit-story" data-uk-modal class="uk-button uk-button-success">
+                <i class="uk-icon-pencil"></i> Submit a Story
+            </a>
+        </div>
+
+        <ul class="uk-navbar-nav uk-navbar-flip">
+            <li>
+                <a href="#settings" data-uk-modal title="Settings" data-uk-tooltip="{pos: 'left'}">
+                    <i class="uk-icon-cog"></i>
+                </a>
+            </li>
+        </ul>
+
+        <div class="uk-navbar-content uk-navbar-flip">
+            <a href="#add-row" data-uk-modal class="uk-button uk-button-success">
+                <i class="uk-icon-plus"></i> Add Row
+            </a>
+        </div>
+    </nav>
+</script>
+
+<!-- Scripts -->
 
 <script type="text/javascript" src="//cdn.steemjs.com/lib/latest/steem.min.js"></script>
 <script type="text/javascript" src="assets/vendor/jquery/dist/jquery.min.js"></script>

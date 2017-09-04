@@ -1,3 +1,7 @@
+html {
+    background: #666;
+}
+
 body {
     padding-bottom: 42px;
 }
@@ -14,6 +18,12 @@ body * {
 
 #top-bar .uk-navbar-nav > li > a {
     padding: 0 10px;
+}
+
+#username-form input {
+    border: none;
+    border-bottom: solid 1px #ccc;
+    font-size: 16px;
 }
 
 #profile-image {
@@ -43,6 +53,15 @@ body * {
     padding: 0;
 }
 
+#reset-user {
+    color: #ccc;
+    cursor: pointer;
+}
+
+#reset-user:hover {
+    color: #d85030;
+}
+
 #logo {
     color: #ccc;
     line-height: 40px;
@@ -58,7 +77,6 @@ body * {
 }
 
 #rows {
-    background: #666;
     padding: 10px;
 }
 
@@ -197,4 +215,16 @@ body * {
 #post .post-comments .uk-comment-meta {
     margin-top: 5px;
     font-size: 16px;
+}
+
+/**
+ * Transitions
+ */
+
+.fade-enter-active, .fade-leave-active {
+    transition: opacity .5s
+}
+
+.fade-enter, .fade-leave-to /* .fade-leave-active below version 2.1.8 */ {
+    opacity: 0
 }
