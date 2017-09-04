@@ -147,8 +147,8 @@ let steemDeck = new Vue({
                                         this.userInfo.profileImage = null;
                                         if (this.account.json_metadata) {
                                             let meta = JSON.parse(this.account.json_metadata);
-                                            if (meta.profile) {
-                                                this.userInfo.profileImage = meta.profile;
+                                            if (meta.profile && meta.profile.profile_image) {
+                                                this.userInfo.profileImage = meta.profile.profile_image;
                                             }
                                         }
 

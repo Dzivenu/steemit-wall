@@ -537,7 +537,7 @@
                         <ul class="uk-nav uk-nav-navbar">
                             <li class="uk-nav-header uk-text-center">
                                 @{{ userInfo.username }}<br>
-                                <div id="profile-image-big"></div>
+                                <div v-if="userInfo.profileImage" id="profile-image-big" v-bind:style="'background-image: url(https://steemitimages.com/110x110/' + userInfo.profileImage + ')'"></div>
                             </li>
                             <li class="uk-nav-header uk-text-center uk-margin-remove">
                                 <small>Voting Power</small><br>
@@ -552,7 +552,7 @@
 
                 </li>
                 <li v-if="userInfo.profileImage">
-                    <a href="#" id="profile-image" v-bind:style="'background-image: url(https://steemitimages.com/50x50/' + userInfo.profileImage + ')'"></a>
+                    <a href="#" id="profile-image" v-bind:style="'background-image: url(https://steemitimages.com/50x50/' + userInfo.profileImage + ');'"></a>
                 </li>
                 <li class="uk-hidden-small"><a href="#">@{{ userInfo.username }}</a></li>
                 <li><span class="uk-badge uk-badge-notification account-reputation">{{ userInfo.reputation }}</span></li>
