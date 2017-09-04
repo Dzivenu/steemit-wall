@@ -94,23 +94,36 @@ let steemDeck = new Vue({
                     updateUserIntervalSeconds: 30
                 }
             },
+            created: function () {
+                if (loadFromLocalStorage('username')) {
+                    this.usernameQuery = loadFromLocalStorage('username');
+                    this.lookupAccount(null, true);
+                }
+            },
             methods: {
-                lookupAccount: function () {
+                lookupAccount: function (e, setUserInfoIfFound) {
                     this.accountTmp = null;
                     this.lookingUpAccount = true;
                     steem.api.getAccounts([this.usernameQuery], (err, accounts) => {
                         if (!err) {
                             this.accountTmp = accounts[0];
+
+                            if (setUserInfoIfFound) {
+                                this.setUserInfo();
+                            }
                         }
 
                         this.lookingUpAccount = false;
                     });
                 },
                 setUserInfo: function (e) {
-                    e.preventDefault();
+                    if (e) {
+                        e.preventDefault();
+                    }
                     if (this.accountTmp) {
                         this.account = this.accountTmp;
                         this.updateUser();
+                        saveToLocalStorage('username', this.usernameQuery);
 
                         clearInterval(this.updateUserInterval);
                         this.updateUserInterval = setInterval(() => {
@@ -165,6 +178,7 @@ let steemDeck = new Vue({
                         newUpvotes: null,
                         votingPower: null
                     };
+                    saveToLocalStorage('username', false);
                     clearInterval(this.updateUserInterval);
                 }
             },
