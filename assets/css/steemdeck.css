@@ -109,6 +109,14 @@ body * {
     margin-bottom: 10px;
     z-index: 1;
     box-shadow: rgba(0, 0, 0, 0.5) 3px 3px 10px;
+    background: #383838;
+    background: repeating-linear-gradient(
+        -45deg,
+        #383838,
+        #383838 5px,
+        #333 5px,
+        #333 10px
+    );;
 }
 
 .row-nav {
