@@ -231,7 +231,7 @@ $('#upvotes').on('show.uk.modal', function () {
     steemDeck.resetNewUpvotes();
 });
 
-$('.row').on('focusitem.uk.slider', function (event, index) {
+$(document).on('focusitem.uk.slider', '.row', function (event, index) {
     var numberOfPosts = $(this).find('.post').length,
         visiblePosts = window.innerWidth > 767 ? (window.innerWidth > 959 ? 4 : 2) : 1;
 
